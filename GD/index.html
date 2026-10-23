@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Geometry Dash">
+<title>Geometry Dash</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.png">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+#screen{position:fixed;inset:0;width:100%;height:100%;background:#000}
+iframe{display:block;width:100%;height:100%;border:0;background:#000}
+#offline{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:24px;color:white;background:#101019;font:16px system-ui,sans-serif}
+#offline[hidden]{display:none}
+button{margin:12px auto;padding:12px 24px;border:0;border-radius:10px;background:#a8ff20;color:#101019;font:bold 16px system-ui,sans-serif;cursor:pointer}
+@media(orientation:portrait){#screen{inset:auto;top:50%;left:50%;width:100vh;height:100vw;width:100dvh;height:100dvw;transform:translate(-50%,-50%) rotate(90deg)}}
+</style>
+</head>
+<body>
+<main id="screen">
+<iframe id="game" title="Geometry Dash" allow="autoplay; gamepad; fullscreen" allowfullscreen></iframe>
+<section id="offline" hidden><h1>Geometry Dash</h1><p>Connect to the internet to load the game.</p><button id="retry">Retry</button></section>
+</main>
+<script>
+const game=document.getElementById("game");
+const offline=document.getElementById("offline");
+const gameURL="https://web-dashers.github.io/";
+function launch(){
+ if(!navigator.onLine){offline.hidden=false;return;}
+ offline.hidden=true;game.src=gameURL;
+}
+async function lockLandscape(){
+ try{await screen.orientation?.lock?.("landscape");}catch{}
+}
+document.getElementById("retry").addEventListener("click",launch);
+window.addEventListener("online",()=>{if(!offline.hidden)launch();});
+window.addEventListener("pageshow",lockLandscape);
+document.addEventListener("fullscreenchange",lockLandscape);
+if("serviceWorker" in navigator){
+ navigator.serviceWorker.register("./sw.js").catch(error=>console.error("Offline cache failed:",error));
+}
+launch();lockLandscape();
+</script>
+</body>
+</html>
